@@ -2,21 +2,32 @@
 # This file is optional but recommended for Netlify deployments
 
 [build]
-  # No build command needed for static HTML
+  # Build command for Node.js server
+  command = "npm install"
+  # Publish directory for static files
   publish = "."
+  
+# Serverless function configuration
+[functions]
+  # Node.js version
+  node_bundler = "esbuild"
+  
+# Redirect all API and admin routes to serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/.netlify/functions/server"
+  status = 200
 
 [[redirects]]
   # Redirect /index to /
   from = "/index"
   to = "/"
   status = 301
-
-[[redirects]]
-  # Remove .html extension
-  from = "/*"
-  to = "/:splat.html"
-  status = 200
-  force = false
 
 # Headers for security and performance
 [[headers]]

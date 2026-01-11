@@ -103,11 +103,14 @@ app.use((req, res) => {
 // Start Server
 // ============================================
 
-app.listen(PORT, () => {
-    console.log(`🚀 ShamSecure server running on port ${PORT}`);
-    console.log(`📧 Email service: ${config.email.smtp.user ? 'Configured' : 'Not configured'}`);
-    console.log(`🌐 Environment: ${config.server.env}`);
-    console.log(`📍 Site URL: ${config.site.url}`);
-});
+// Only start listening if not in serverless environment
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 ShamSecure server running on port ${PORT}`);
+        console.log(`📧 Email service: ${config.email.smtp.user ? 'Configured' : 'Not configured'}`);
+        console.log(`🌐 Environment: ${config.server.env}`);
+        console.log(`📍 Site URL: ${config.site.url}`);
+    });
+}
 
 module.exports = app;
