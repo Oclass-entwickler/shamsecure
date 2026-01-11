@@ -14,6 +14,19 @@ const config = {
         email: process.env.SITE_EMAIL || 'info@shamsecure.sy'
     },
 
+    // Services Header
+    services: {
+        title: process.env.SERVICES_TITLE || 'خدماتنا',
+        subtitle: process.env.SERVICES_SUBTITLE || 'حلول أمنية شاملة مصممة لاحتياجاتك'
+    },
+
+    // Hero Section
+    hero: {
+        title: process.env.HERO_TITLE || 'حمايتك هي أولويتنا',
+        subtitle: process.env.HERO_SUBTITLE || 'نقدم حلول أمنية متكاملة وموثوقة لضمان سلامتك وسلامة ممتلكاتك',
+        images: process.env.HERO_IMAGES ? process.env.HERO_IMAGES.split(',').map(img => img.trim()) : []
+    },
+
     // Contact Information
     contact: {
         phone: {

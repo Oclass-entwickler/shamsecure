@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات - لوحة التحكم - ShamSecure</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Cairo', sans-serif;
+        }
+        .admin-header {
+            background: #1a4d7a;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .admin-nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .admin-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        .settings-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .settings-card h2 {
+            color: #1a4d7a;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            box-sizing: border-box;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a4d7a;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-save {
+            background: #1a4d7a;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-save:hover {
+            background: #2c6a9e;
+        }
+        .btn-save:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            max-width: 500px;
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast.show {
+            display: flex;
+        }
+        .toast.success {
+            border-left: 5px solid #4caf50;
+        }
+        .toast.error {
+            border-left: 5px solid #f44336;
+        }
+        .toast-icon {
+            font-size: 2rem;
+        }
+        .toast-content {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .toast-message {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .toast-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: none;
+        }
+        .toast-overlay.show {
+            display: block;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        .loading {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        .upload-area:hover {
+            border-color: #1a4d7a;
+            background: #f0f7ff;
+        }
+        .upload-placeholder {
+            pointer-events: none;
+            user-select: none;
+        }
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .uploaded-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .image-item {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .image-item .delete-btn {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        .image-item .delete-btn:hover {
+            background: #f44336;
+            transform: scale(1.1);
+        }
+        .upload-progress {
+            margin-top: 1rem;
+            display: none;
+        }
+        .upload-progress.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>الإعدادات - لوحة تحكم ShamSecure</h1>
+        <div class="admin-nav">
+            <a href="/" target="_blank">الموقع الرئيسي</a>
+            <a href="/admin/">الرئيسية</a>
+            <a href="/admin/settings">الإعدادات</a>
+            <a href="/admin/legal">المحتوى القانوني</a>
+            <a href="/admin/logout">تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <!-- Toast Notification -->
+        <div class="toast-overlay" id="toastOverlay"></div>
+        <div class="toast" id="toast">
+            <div class="toast-icon" id="toastIcon">✓</div>
+            <div class="toast-content">
+                <div class="toast-title" id="toastTitle">نجح!</div>
+                <div class="toast-message" id="toastMessage"></div>
+            </div>
+        </div>
+
+        <!-- Site Information -->
+        <div class="settings-card">
+            <h2>معلومات الموقع</h2>
+            <div class="form-group">
+                <label for="siteName">اسم الموقع (إنجليزي)</label>
+                <input type="text" id="siteName" name="siteName" required>
+            </div>
+            <div class="form-group">
+                <label for="siteNameAr">اسم الموقع (عربي)</label>
+                <input type="text" id="siteNameAr" name="siteNameAr" required>
+            </div>
+            <div class="form-group">
+                <label for="siteUrl">رابط الموقع</label>
+                <input type="url" id="siteUrl" name="siteUrl" required>
+            </div>
+            <div class="form-group">
+                <label for="siteEmail">البريد الإلكتروني العام</label>
+                <input type="email" id="siteEmail" name="siteEmail" required>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="settings-card">
+            <h2>معلومات الاتصال</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phonePrimary">الهاتف الرئيسي</label>
+                    <input type="tel" id="phonePrimary" name="phonePrimary" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneSecondary">الهاتف الثانوي</label>
+                    <input type="tel" id="phoneSecondary" name="phoneSecondary">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="emailInfo">البريد الإلكتروني - معلومات</label>
+                    <input type="email" id="emailInfo" name="emailInfo" required>
+                </div>
+                <div class="form-group">
+                    <label for="emailSales">البريد الإلكتروني - مبيعات</label>
+                    <input type="email" id="emailSales" name="emailSales" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="emailSupport">البريد الإلكتروني - دعم</label>
+                <input type="email" id="emailSupport" name="emailSupport" required>
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="settings-card">
+            <h2>العنوان</h2>
+            <div class="form-group">
+                <label for="addressCity">المدينة</label>
+                <input type="text" id="addressCity" name="addressCity" required>
+            </div>
+            <div class="form-group">
+                <label for="addressStreet">الشارع والعنوان</label>
+                <textarea id="addressStreet" name="addressStreet" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="addressCountry">الدولة</label>
+                <input type="text" id="addressCountry" name="addressCountry" required>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="settings-card">
+            <h2>قسم البطل (الصفحة الرئيسية)</h2>
+            <div class="form-group">
+                <label for="heroTitle">العنوان الرئيسي</label>
+                <input type="text" id="heroTitle" name="heroTitle" required placeholder="حمايتك هي أولويتنا">
+            </div>
+            <div class="form-group">
+                <label for="heroSubtitle">العنوان الفرعي</label>
+                <input type="text" id="heroSubtitle" name="heroSubtitle" required placeholder="نقدم حلول أمنية متكاملة وموثوقة لضمان سلامتك وسلامة ممتلكاتك">
+            </div>
+            <div class="form-group">
+                <label>رفع الصور (حد أقصى 5 صور)</label>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📤</div>
+                        <p>انقر لرفع الصور أو اسحبها هنا</p>
+                        <small>JPEG, JPG, PNG, GIF, WEBP (حد أقصى 5MB لكل صورة)</small>
+                    </div>
+                </div>
+                <div class="uploaded-images" id="uploadedImages">
+                    <!-- Images will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Header -->
+        <div class="settings-card">
+            <h2>عنوان صفحة الخدمات</h2>
+            <div class="form-group">
+                <label for="servicesTitle">العنوان الرئيسي</label>
+                <input type="text" id="servicesTitle" name="servicesTitle" required placeholder="خدماتنا">
+            </div>
+            <div class="form-group">
+                <label for="servicesSubtitle">العنوان الفرعي</label>
+                <input type="text" id="servicesSubtitle" name="servicesSubtitle" required placeholder="حلول أمنية شاملة مصممة لاحتياجاتك">
+            </div>
+        </div>
+
+        <!-- Social Media -->
+        <div class="settings-card">
+            <h2>وسائل التواصل الاجتماعي</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="facebookUrl">Facebook</label>
+                    <input type="url" id="facebookUrl" name="facebookUrl" placeholder="https://facebook.com/...">
+                </div>
+                <div class="form-group">
+                    <label for="instagramUrl">Instagram</label>
+                    <input type="url" id="instagramUrl" name="instagramUrl" placeholder="https://instagram.com/...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="linkedinUrl">LinkedIn</label>
+                    <input type="url" id="linkedinUrl" name="linkedinUrl" placeholder="https://linkedin.com/...">
+                </div>
+                <div class="form-group">
+                    <label for="twitterUrl">Twitter</label>
+                    <input type="url" id="twitterUrl" name="twitterUrl" placeholder="https://twitter.com/...">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <button type="button" class="btn-save" id="saveBtn" onclick="saveSettings()">
+                حفظ التغييرات
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Load current settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/admin/api/settings');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const config = data.data;
+                    
+                    // Site Information
+                    document.getElementById('siteName').value = config.site.name || '';
+                    document.getElementById('siteNameAr').value = config.site.nameAr || '';
+                    document.getElementById('siteUrl').value = config.site.url || '';
+                    document.getElementById('siteEmail').value = config.site.email || '';
+                    
+                    // Contact Information
+                    document.getElementById('phonePrimary').value = config.contact.phone.primary || '';
+                    document.getElementById('phoneSecondary').value = config.contact.phone.secondary || '';
+                    document.getElementById('emailInfo').value = config.contact.email.info || '';
+                    document.getElementById('emailSales').value = config.contact.email.sales || '';
+                    document.getElementById('emailSupport').value = config.contact.email.support || '';
+                    
+                    // Address
+                    document.getElementById('addressCity').value = config.contact.address.city || '';
+                    document.getElementById('addressStreet').value = config.contact.address.street || '';
+                    document.getElementById('addressCountry').value = config.contact.address.country || '';
+                    
+                    // Social Media
+                    document.getElementById('facebookUrl').value = config.social.facebook || '';
+                    document.getElementById('instagramUrl').value = config.social.instagram || '';
+                    document.getElementById('linkedinUrl').value = config.social.linkedin || '';
+                    document.getElementById('twitterUrl').value = config.social.twitter || '';
+                    
+                    // Services Header
+                    if (config.services) {
+                        document.getElementById('servicesTitle').value = config.services.title || '';
+                        document.getElementById('servicesSubtitle').value = config.services.subtitle || '';
+                    }
+                    
+                    // Hero Section
+                    if (config.hero) {
+                        document.getElementById('heroTitle').value = config.hero.title || '';
+                        document.getElementById('heroSubtitle').value = config.hero.subtitle || '';
+                        loadHeroImages();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showMessage('خطأ في تحميل الإعدادات', 'error');
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading">⏳</span>جاري الحفظ...';
+
+            const settings = {
+                site: {
+                    name: document.getElementById('siteName').value,
+                    nameAr: document.getElementById('siteNameAr').value,
+                    url: document.getElementById('siteUrl').value,
+                    email: document.getElementById('siteEmail').value
+                },
+                contact: {
+                    phone: {
+                        primary: document.getElementById('phonePrimary').value,
+                        secondary: document.getElementById('phoneSecondary').value
+                    },
+                    email: {
+                        info: document.getElementById('emailInfo').value,
+                        sales: document.getElementById('emailSales').value,
+                        support: document.getElementById('emailSupport').value
+                    },
+                    address: {
+                        city: document.getElementById('addressCity').value,
+                        street: document.getElementById('addressStreet').value,
+                        country: document.getElementById('addressCountry').value
+                    }
+                },
+                social: {
+                    facebook: document.getElementById('facebookUrl').value,
+                    instagram: document.getElementById('instagramUrl').value,
+                    linkedin: document.getElementById('linkedinUrl').value,
+                    twitter: document.getElementById('twitterUrl').value
+                },
+                services: {
+                    title: document.getElementById('servicesTitle').value,
+                    subtitle: document.getElementById('servicesSubtitle').value
+                },
+                hero: {
+                    title: document.getElementById('heroTitle').value,
+                    subtitle: document.getElementById('heroSubtitle').value,
+                    images: [] // Images are managed separately via upload API
+                }
+            };
+
+            try {
+                const response = await fetch('/admin/api/settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('تم حفظ جميع الإعدادات بنجاح', 'success');
+                } else {
+                    showMessage(data.message || 'حدث خطأ أثناء حفظ الإعدادات', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showMessage('حدث خطأ. يرجى المحاولة لاحقاً', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        function showMessage(text, type) {
+            const toast = document.getElementById('toast');
+            const toastOverlay = document.getElementById('toastOverlay');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set icon and title based on type
+            if (type === 'success') {
+                toastIcon.textContent = '✓';
+                toastIcon.style.color = '#4caf50';
+                toastTitle.textContent = 'تم الحفظ بنجاح!';
+                toast.className = 'toast success';
+            } else {
+                toastIcon.textContent = '✕';
+                toastIcon.style.color = '#f44336';
+                toastTitle.textContent = 'حدث خطأ';
+                toast.className = 'toast error';
+            }
+            
+            toastMessage.textContent = text;
+            
+            // Show toast
+            toastOverlay.classList.add('show');
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toastOverlay.classList.remove('show');
+                }, 300);
+            }, 3000);
+        }
+
+        // Load hero images
+        async function loadHeroImages() {
+            try {
+                const response = await fetch('/admin/api/hero/images');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayImages(data.images || []);
+                }
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        }
+
+        // Display uploaded images
+        function displayImages(images) {
+            const container = document.getElementById('uploadedImages');
+            container.innerHTML = '';
+            
+            if (images.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; grid-column: 1/-1;">لا توجد صور مرفوعة</p>';
+                return;
+            }
+
+            images.forEach((imageUrl, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                
+                const filename = imageUrl.split('/').pop();
+                
+                imageItem.innerHTML = `
+                    <img src="${imageUrl}" alt="Hero Image ${index + 1}" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 200 200\\'><rect width=\\'200\\' height=\\'200\\' fill=\\'%23ddd\\'/><text x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\' dy=\\'.3em\\' fill=\\'%23999\\'>Image</text></svg>'">
+                    <button class="delete-btn" onclick="deleteImage('${filename}')" title="حذف الصورة">×</button>
+                `;
+                
+                container.appendChild(imageItem);
+            });
+        }
+
+        // Upload image
+        document.getElementById('imageUpload').addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            // Check current image count
+            const currentImages = document.querySelectorAll('.image-item').length;
+            if (currentImages >= 5) {
+                showMessage('الحد الأقصى هو 5 صور. يرجى حذف صورة أولاً', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            // Upload each file
+            for (let i = 0; i < files.length; i++) {
+                if (currentImages + i >= 5) {
+                    showMessage('تم الوصول إلى الحد الأقصى (5 صور)', 'error');
+                    break;
+                }
+
+                const formData = new FormData();
+                formData.append('image', files[i]);
+
+                try {
+                    const response = await fetch('/admin/api/hero/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    // Check if response is ok
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Upload failed with status:', response.status, errorText);
+                        showMessage('حدث خطأ أثناء رفع الصورة (رمز الخطأ: ' + response.status + ')', 'error');
+                        return;
+                    }
+
+                    // Parse JSON response
+                    const data = await response.json();
+                    console.log('Upload response:', data);
+
+                    if (data.success) {
+                        await loadHeroImages();
+                        showMessage('تم رفع الصورة بنجاح', 'success');
+                    } else {
+                        console.error('Upload error:', data);
+                        showMessage(data.message || 'حدث خطأ أثناء رفع الصورة', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    showMessage('حدث خطأ أثناء رفع الصورة: ' + (error.message || 'خطأ غير معروف'), 'error');
+                }
+            }
+
+            e.target.value = '';
+        });
+
+        // Delete image
+        async function deleteImage(filename) {
+            if (!confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/hero/image/${filename}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadHeroImages();
+                    showMessage('تم حذف الصورة بنجاح', 'success');
+                } else {
+                    showMessage(data.message || 'حدث خطأ أثناء حذف الصورة', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                showMessage('حدث خطأ أثناء حذف الصورة', 'error');
+            }
+        }
+
+        // Click to upload
+        const uploadArea = document.getElementById('uploadArea');
+        const imageUpload = document.getElementById('imageUpload');
+        
+        uploadArea.addEventListener('click', (e) => {
+            // Only trigger if clicking on the upload area itself, not on child elements
+            if (e.target === uploadArea || e.target.closest('.upload-placeholder')) {
+                e.preventDefault();
+                e.stopPropagation();
+                imageUpload.click();
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#1a4d7a';
+            uploadArea.style.background = '#f0f7ff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.background = '#f9f9f9';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.background = '#f9f9f9';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Use DataTransfer to properly set files
+                const dataTransfer = new DataTransfer();
+                for (let i = 0; i < files.length; i++) {
+                    dataTransfer.items.add(files[i]);
+                }
+                imageUpload.files = dataTransfer.files;
+                imageUpload.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+
+        // Load settings on page load
+        loadSettings();
+    </script>
+</body>
+</html>

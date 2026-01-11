@@ -5,6 +5,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -28,6 +29,9 @@ app.use(helmet({
 
 // CORS
 app.use(cors());
+
+// Cookie Parser
+app.use(cookieParser());
 
 // Body Parser
 app.use(bodyParser.json());

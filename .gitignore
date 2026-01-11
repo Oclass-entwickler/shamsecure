@@ -50,3 +50,7 @@ build/
 
 # Session files
 sessions/
+
+# Uploaded files (keep directory structure)
+uploads/hero/*
+!uploads/hero/.gitkeep

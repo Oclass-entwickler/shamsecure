@@ -52,24 +52,24 @@
                             <div class="contact-icon">📞</div>
                             <div>
                                 <h3>الهاتف</h3>
-                                <p>+963 11 123 4567</p>
-                                <p>+963 11 123 4568</p>
+                                <p data-phone-primary>+963 11 123 4567</p>
+                                <p data-phone-secondary>+963 11 123 4568</p>
                             </div>
                         </div>
                         <div class="contact-detail-item">
                             <div class="contact-icon">📧</div>
                             <div>
                                 <h3>البريد الإلكتروني</h3>
-                                <p>info@shamsecure.sy</p>
-                                <p>sales@shamsecure.sy</p>
+                                <p data-email-info>info@shamsecure.sy</p>
+                                <p data-email-sales>sales@shamsecure.sy</p>
                             </div>
                         </div>
                         <div class="contact-detail-item">
                             <div class="contact-icon">📍</div>
                             <div>
                                 <h3>العنوان</h3>
-                                <p>دمشق، سوريا</p>
-                                <p>شارع الرئيسي، مبنى رقم 123</p>
+                                <p data-address-full>دمشق، سوريا</p>
+                                <p data-address-street>شارع الرئيسي، مبنى رقم 123</p>
                             </div>
                         </div>
                         <div class="contact-detail-item">
@@ -209,7 +209,7 @@
         <div class="container">
             <h2>موقعنا</h2>
             <div class="map-placeholder">
-                <p>📍 دمشق، سوريا - شارع الرئيسي، مبنى رقم 123</p>
+                <p>📍 <span data-address-full>دمشق، سوريا</span> - <span data-address-street>شارع الرئيسي، مبنى رقم 123</span></p>
                 <p class="map-note">(خريطة تفاعلية يمكن إضافتها لاحقاً باستخدام Google Maps أو خدمة خرائط أخرى)</p>
             </div>
         </div>
@@ -242,9 +242,9 @@
                 <div class="footer-section">
                     <h4>معلومات الاتصال</h4>
                     <ul class="contact-info">
-                        <li>📞 +963 11 123 4567</li>
-                        <li>📧 info@shamsecure.sy</li>
-                        <li>📍 دمشق، سوريا</li>
+                        <li>📞 <span data-phone-primary>+963 11 123 4567</span></li>
+                        <li>📧 <span data-email-info>info@shamsecure.sy</span></li>
+                        <li>📍 <span data-address-full>دمشق، سوريا</span></li>
                         <li>🕐 متاح 24/7</li>
                     </ul>
                 </div>
@@ -263,5 +263,6 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="public/config-loader.js"></script>
 </body>
 </html>

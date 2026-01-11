@@ -179,9 +179,48 @@ router.get('/config', (req, res) => {
                 email: config.contact.email,
                 address: config.contact.address
             },
-            social: config.social
+            social: config.social,
+            services: config.services,
+            hero: config.hero
         }
     });
+});
+
+// Get Legal Content (Public)
+router.get('/legal/:type', (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const legalPath = path.join(__dirname, '../data/legal-content.json');
+    
+    try {
+        if (fs.existsSync(legalPath)) {
+            const legalContent = JSON.parse(fs.readFileSync(legalPath, 'utf8'));
+            const type = req.params.type; // 'privacy' or 'terms'
+            
+            if (legalContent[type]) {
+                res.json({
+                    success: true,
+                    data: legalContent[type]
+                });
+            } else {
+                res.status(404).json({
+                    success: false,
+                    message: 'المحتوى غير موجود'
+                });
+            }
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'المحتوى غير موجود'
+            });
+        }
+    } catch (error) {
+        console.error('Error reading legal content:', error);
+        res.status(500).json({
+            success: false,
+            message: 'خطأ في قراءة المحتوى'
+        });
+    }
 });
 
 module.exports = router;

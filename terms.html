@@ -37,15 +37,15 @@
     <section class="page-header">
         <div class="container">
             <h1>شروط الخدمة</h1>
-            <p>آخر تحديث: ديسمبر 2026</p>
+            <p>آخر تحديث: <span id="lastUpdated">ديسمبر 2026</span></p>
         </div>
     </section>
 
     <!-- Terms Content -->
     <section class="legal-content">
         <div class="container">
-            <div class="legal-text">
-                <h2>1. القبول بالشروط</h2>
+            <div class="legal-text" id="legalContent">
+                <p>جاري تحميل المحتوى...</p>
                 <p>باستخدام موقع ShamSecure الإلكتروني ("الموقع") أو الخدمات المقدمة من قبل ShamSecure ("الشركة"، "نحن"، "لنا")، أنت توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام موقعنا أو خدماتنا.</p>
 
                 <h2>2. تعريفات</h2>
@@ -140,9 +140,9 @@
                 <h2>14. الاتصال بنا</h2>
                 <p>إذا كان لديك أي أسئلة حول شروط الخدمة هذه، يرجى التواصل معنا:</p>
                 <ul>
-                    <li>البريد الإلكتروني: info@shamsecure.sy</li>
-                    <li>الهاتف: +963 11 123 4567</li>
-                    <li>العنوان: دمشق، سوريا</li>
+                    <li>البريد الإلكتروني: <span data-email-info>info@shamsecure.sy</span></li>
+                    <li>الهاتف: <span data-phone-primary>+963 11 123 4567</span></li>
+                    <li>العنوان: <span data-address-full>دمشق، سوريا</span></li>
                 </ul>
 
                 <h2>15. القبول</h2>
@@ -178,9 +178,9 @@
                 <div class="footer-section">
                     <h4>معلومات الاتصال</h4>
                     <ul class="contact-info">
-                        <li>📞 +963 11 123 4567</li>
-                        <li>📧 info@shamsecure.sy</li>
-                        <li>📍 دمشق، سوريا</li>
+                        <li>📞 <span data-phone-primary>+963 11 123 4567</span></li>
+                        <li>📧 <span data-email-info>info@shamsecure.sy</span></li>
+                        <li>📍 <span data-address-full>دمشق، سوريا</span></li>
                         <li>🕐 متاح 24/7</li>
                     </ul>
                 </div>
@@ -199,5 +199,23 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="public/config-loader.js"></script>
+    <script>
+        // Load legal content
+        async function loadLegalContent() {
+            try {
+                const response = await fetch('/api/legal/terms');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('lastUpdated').textContent = data.data.lastUpdated || 'ديسمبر 2026';
+                    document.getElementById('legalContent').innerHTML = data.data.content || document.getElementById('legalContent').innerHTML;
+                }
+            } catch (error) {
+                console.error('Error loading legal content:', error);
+            }
+        }
+        loadLegalContent();
+    </script>
 </body>
 </html>
