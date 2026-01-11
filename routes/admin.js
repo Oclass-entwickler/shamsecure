@@ -249,10 +249,16 @@ router.get('/settings', authenticateAdmin, (req, res) => {
 // File Upload Configuration
 // ============================================
 
-// Ensure upload directory exists
+// Ensure upload directory exists (only if writable)
 const uploadsDir = path.join(__dirname, '../uploads/hero');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+} catch (error) {
+    // Ignore errors on read-only filesystems (e.g., Netlify)
+    // Uploads will still work if directory exists from deployment
+    console.warn('Could not create uploads directory (this is OK on Netlify):', error.message);
 }
 
 // Configure multer for image uploads
