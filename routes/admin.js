@@ -17,19 +17,30 @@ const config = require('../config');
 
 // Helper function to find admin file paths (works on both local and Netlify)
 function findAdminFilePath(filename) {
+    // On Netlify: __dirname = /var/task/netlify/functions, cwd = /var/task
+    // Locally: __dirname = /path/to/project/routes, cwd = /path/to/project
+    
     const possiblePaths = [
-        path.join(__dirname, '../admin', filename), // Normal case
-        path.join(process.cwd(), 'admin', filename), // Netlify case
-        path.join(__dirname, '../../admin', filename), // If in netlify/functions
-        path.resolve('./admin', filename) // Absolute from current working directory
+        path.join(process.cwd(), 'admin', filename), // Netlify case (cwd = /var/task)
+        path.join(__dirname, '../admin', filename), // Normal local case
+        path.join(__dirname, '../../admin', filename), // If in netlify/functions/routes
+        path.resolve(process.cwd(), 'admin', filename), // Absolute from cwd
+        path.resolve(__dirname, '../admin', filename) // Absolute from __dirname
     ];
     
+    console.log('Looking for admin file:', filename);
+    console.log('__dirname:', __dirname);
+    console.log('process.cwd():', process.cwd());
+    
     for (const possiblePath of possiblePaths) {
+        console.log('Checking path:', possiblePath, 'exists:', fs.existsSync(possiblePath));
         if (fs.existsSync(possiblePath)) {
+            console.log('Found file at:', possiblePath);
             return possiblePath;
         }
     }
     
+    console.error('File not found in any of the paths:', possiblePaths);
     // Return the most likely path even if it doesn't exist (for error handling)
     return possiblePaths[0];
 }
