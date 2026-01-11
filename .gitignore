@@ -51,6 +51,6 @@ build/
 # Session files
 sessions/
 
-# Uploaded files (keep directory structure)
-uploads/hero/*
-!uploads/hero/.gitkeep
+# Uploaded files - NOT ignored (so they can be deployed)
+# uploads/hero/*
+# !uploads/hero/.gitkeep

@@ -174,8 +174,8 @@ router.put('/api/settings', authenticateAdmin, async (req, res) => {
             'SERVICES_TITLE': services ? services.title : '',
             'SERVICES_SUBTITLE': services ? services.subtitle : '',
             'HERO_TITLE': hero ? hero.title : '',
-            'HERO_SUBTITLE': hero ? hero.subtitle : ''
-            // HERO_IMAGES is managed separately via upload API, don't update it here
+            'HERO_SUBTITLE': hero ? hero.subtitle : '',
+            'HERO_IMAGES': hero && hero.images && hero.images.length > 0 ? hero.images.join(',') : ''
         };
         
         // Parse existing .env content
@@ -249,19 +249,10 @@ router.get('/settings', authenticateAdmin, (req, res) => {
 // File Upload Configuration
 // ============================================
 
-// Ensure upload directory exists (only if writable)
+// Ensure upload directory exists
 const uploadsDir = path.join(__dirname, '../uploads/hero');
-const isNetlify = process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME;
-
-// Only create directory if not on Netlify (read-only filesystem)
-if (!isNetlify) {
-    if (!fs.existsSync(uploadsDir)) {
-        try {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-        } catch (error) {
-            console.warn('Could not create uploads directory:', error.message);
-        }
-    }
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 // Configure multer for image uploads
@@ -296,16 +287,6 @@ const upload = multer({
 
 // API: Upload Hero Image
 router.post('/api/hero/upload', authenticateAdmin, (req, res, next) => {
-    // Check if we're on Netlify (read-only filesystem)
-    const isNetlify = process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME;
-    
-    if (isNetlify) {
-        return res.status(503).json({
-            success: false,
-            message: 'رفع الملفات غير متاح على Netlify. يرجى استخدام روابط الصور مباشرة في حقل HERO_IMAGES أو استخدام خدمة تخزين سحابية مثل Cloudinary.'
-        });
-    }
-    
     upload.single('image')(req, res, (err) => {
         if (err) {
             console.error('Multer upload error:', err);
@@ -421,16 +402,6 @@ router.post('/api/hero/upload', authenticateAdmin, (req, res, next) => {
 
 // API: Delete Hero Image
 router.delete('/api/hero/image/:filename', authenticateAdmin, (req, res) => {
-    // Check if we're on Netlify (read-only filesystem)
-    const isNetlify = process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME;
-    
-    if (isNetlify) {
-        return res.status(503).json({
-            success: false,
-            message: 'حذف الملفات غير متاح على Netlify. يرجى تحديث HERO_IMAGES في Environment Variables.'
-        });
-    }
-    
     try {
         const filename = req.params.filename;
         const imagePath = path.join(uploadsDir, filename);

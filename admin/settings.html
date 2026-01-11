@@ -347,8 +347,8 @@
                 <input type="text" id="heroSubtitle" name="heroSubtitle" required placeholder="نقدم حلول أمنية متكاملة وموثوقة لضمان سلامتك وسلامة ممتلكاتك">
             </div>
             <div class="form-group">
-                <label>روابط الصور (حد أقصى 5 صور)</label>
-                <div class="upload-area" id="uploadArea" style="display: none;">
+                <label>رفع الصور (حد أقصى 5 صور)</label>
+                <div class="upload-area" id="uploadArea">
                     <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
                     <div class="upload-placeholder">
                         <div class="upload-icon">📤</div>
@@ -357,9 +357,9 @@
                     </div>
                 </div>
                 <div class="form-group" style="margin-top: 1rem;">
-                    <label for="heroImagesUrls">أدخل روابط الصور (مفصولة بفواصل)</label>
+                    <label for="heroImagesUrls">أو أدخل روابط الصور مباشرة (مفصولة بفواصل) - اختياري</label>
                     <textarea id="heroImagesUrls" name="heroImagesUrls" rows="4" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
-                    <small style="color: #666; display: block; margin-top: 0.5rem;">💡 على Netlify: استخدم روابط الصور مباشرة. يمكنك الصور auf Cloudinary, Imgur, oder anderen Services hochladen.</small>
+                    <small style="color: #666; display: block; margin-top: 0.5rem;">💡 يمكنك رفع الصور أعلاه أو إدخال روابط مباشرة</small>
                 </div>
                 <div class="uploaded-images" id="uploadedImages">
                     <!-- Images will be displayed here -->
@@ -511,7 +511,15 @@
                 hero: {
                     title: document.getElementById('heroTitle').value,
                     subtitle: document.getElementById('heroSubtitle').value,
-                    images: document.getElementById('heroImagesUrls').value.split(',').map(img => img.trim()).filter(img => img.length > 0)
+                    images: (() => {
+                        // Get URLs from textarea if provided
+                        const urlsText = document.getElementById('heroImagesUrls').value.trim();
+                        if (urlsText) {
+                            return urlsText.split(',').map(img => img.trim()).filter(img => img.length > 0);
+                        }
+                        // Otherwise, images are managed via upload API
+                        return [];
+                    })()
                 }
             };
 
