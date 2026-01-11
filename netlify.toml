@@ -19,17 +19,10 @@
   status = 200
   force = true
 
-# Redirect admin routes to dedicated admin function
-# Note: Netlify passes the full path in event.path, so we need to handle it in the function
-[[redirects]]
-  from = "/admin"
-  to = "/.netlify/functions/admin"
-  status = 200
-  force = true
-
+# Redirect admin routes to main server function (simpler and more reliable)
 [[redirects]]
   from = "/admin/*"
-  to = "/.netlify/functions/admin/:splat"
+  to = "/.netlify/functions/server"
   status = 200
   force = true
 

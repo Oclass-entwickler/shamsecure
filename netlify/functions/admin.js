@@ -35,37 +35,43 @@ exports.handler = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     
     // Fix the path for Netlify redirects
-    // Netlify passes the full path in event.path
-    // When redirecting /admin/login, the path might be /.netlify/functions/admin/login
-    // or just /login depending on how the redirect is configured
+    // When Netlify redirects /admin/login to /.netlify/functions/admin,
+    // the original path is in event.rawPath or we need to extract it from event.path
     
     let actualPath = event.path || '/';
     
-    // Remove /.netlify/functions/admin prefix if present
-    if (actualPath.startsWith('/.netlify/functions/admin')) {
-        actualPath = actualPath.replace('/.netlify/functions/admin', '') || '/';
-    }
-    // Remove /admin prefix if present (shouldn't happen with redirects, but just in case)
-    else if (actualPath.startsWith('/admin')) {
+    // Check if we have rawPath (original request path)
+    if (event.rawPath) {
+        // Extract the path after /admin
+        if (event.rawPath.startsWith('/admin')) {
+            actualPath = event.rawPath.replace('/admin', '') || '/';
+        }
+    } else if (actualPath.startsWith('/.netlify/functions/admin')) {
+        // If path is the function path, try to extract from query or use root
+        actualPath = '/';
+    } else if (actualPath.startsWith('/admin')) {
+        // Remove /admin prefix
         actualPath = actualPath.replace('/admin', '') || '/';
     }
     
-    // Update event.path to the actual path
+    // Update event.path and rawPath
     event.path = actualPath;
+    if (event.rawPath && event.rawPath.startsWith('/admin')) {
+        event.rawPath = event.rawPath.replace('/admin', '') || '/';
+    }
     
-    // Also update rawPath if it exists
-    if (event.rawPath) {
-        if (event.rawPath.startsWith('/.netlify/functions/admin')) {
-            event.rawPath = event.rawPath.replace('/.netlify/functions/admin', '') || '/';
-        } else if (event.rawPath.startsWith('/admin')) {
-            event.rawPath = event.rawPath.replace('/admin', '') || '/';
-        }
+    // Also check for path in query string (Netlify sometimes passes it there)
+    if (event.queryStringParameters && event.queryStringParameters.path) {
+        actualPath = event.queryStringParameters.path;
+        event.path = actualPath;
     }
     
     console.log('Admin function called');
-    console.log('Original path:', event.path);
-    console.log('Fixed path:', actualPath);
+    console.log('Event path:', event.path);
+    console.log('Event rawPath:', event.rawPath);
+    console.log('Actual path:', actualPath);
     console.log('Query params:', event.queryStringParameters);
+    console.log('HTTP method:', event.httpMethod);
     
     return handler(event, context);
 };
