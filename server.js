@@ -91,10 +91,21 @@ app.get('/terms', (req, res) => {
 // ============================================
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Error stack:', err.stack);
+    console.error('Error message:', err.message);
+    console.error('Request path:', req.path);
+    console.error('Request method:', req.method);
+    
+    // In development, send more details
+    const isDevelopment = config.server.env !== 'production';
+    
     res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: 'Internal server error',
+        ...(isDevelopment && {
+            error: err.message,
+            stack: err.stack
+        })
     });
 });
 

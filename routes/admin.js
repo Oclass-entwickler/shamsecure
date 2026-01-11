@@ -47,7 +47,23 @@ const authenticateAdmin = (req, res, next) => {
 
 // Login Page
 router.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin/login.html'));
+    try {
+        const loginPath = path.join(__dirname, '../admin/login.html');
+        if (!fs.existsSync(loginPath)) {
+            console.error('Login file not found at:', loginPath);
+            return res.status(404).json({
+                success: false,
+                message: 'Login page not found'
+            });
+        }
+        res.sendFile(loginPath);
+    } catch (error) {
+        console.error('Error serving login page:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error loading login page: ' + error.message
+        });
+    }
 });
 
 // Login POST
