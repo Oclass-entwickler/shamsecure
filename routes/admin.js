@@ -12,6 +12,29 @@ const multer = require('multer');
 const config = require('../config');
 
 // ============================================
+// Helper Functions
+// ============================================
+
+// Helper function to find admin file paths (works on both local and Netlify)
+function findAdminFilePath(filename) {
+    const possiblePaths = [
+        path.join(__dirname, '../admin', filename), // Normal case
+        path.join(process.cwd(), 'admin', filename), // Netlify case
+        path.join(__dirname, '../../admin', filename), // If in netlify/functions
+        path.resolve('./admin', filename) // Absolute from current working directory
+    ];
+    
+    for (const possiblePath of possiblePaths) {
+        if (fs.existsSync(possiblePath)) {
+            return possiblePath;
+        }
+    }
+    
+    // Return the most likely path even if it doesn't exist (for error handling)
+    return possiblePaths[0];
+}
+
+// ============================================
 // Middleware
 // ============================================
 
@@ -48,12 +71,18 @@ const authenticateAdmin = (req, res, next) => {
 // Login Page
 router.get('/login', (req, res) => {
     try {
-        const loginPath = path.join(__dirname, '../admin/login.html');
+        const loginPath = findAdminFilePath('login.html');
         if (!fs.existsSync(loginPath)) {
             console.error('Login file not found at:', loginPath);
+            console.error('Current __dirname:', __dirname);
+            console.error('Current process.cwd():', process.cwd());
             return res.status(404).json({
                 success: false,
-                message: 'Login page not found'
+                message: 'Login page not found',
+                debug: {
+                    __dirname: __dirname,
+                    cwd: process.cwd()
+                }
             });
         }
         res.sendFile(loginPath);
@@ -122,7 +151,15 @@ router.get('/logout', (req, res) => {
 
 // Dashboard (Protected)
 router.get('/', authenticateAdmin, (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin/dashboard.html'));
+    const dashboardPath = findAdminFilePath('dashboard.html');
+    if (!fs.existsSync(dashboardPath)) {
+        console.error('Dashboard file not found at:', dashboardPath);
+        return res.status(404).json({
+            success: false,
+            message: 'Dashboard page not found'
+        });
+    }
+    res.sendFile(dashboardPath);
 });
 
 // API: Get Stats
@@ -258,7 +295,15 @@ router.put('/api/settings', authenticateAdmin, async (req, res) => {
 
 // Settings Page
 router.get('/settings', authenticateAdmin, (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin/settings.html'));
+    const settingsPath = findAdminFilePath('settings.html');
+    if (!fs.existsSync(settingsPath)) {
+        console.error('Settings file not found at:', settingsPath);
+        return res.status(404).json({
+            success: false,
+            message: 'Settings page not found'
+        });
+    }
+    res.sendFile(settingsPath);
 });
 
 // ============================================
@@ -596,7 +641,15 @@ router.put('/api/legal', authenticateAdmin, async (req, res) => {
 
 // Legal Content Page
 router.get('/legal', authenticateAdmin, (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin/legal.html'));
+    const legalPath = findAdminFilePath('legal.html');
+    if (!fs.existsSync(legalPath)) {
+        console.error('Legal file not found at:', legalPath);
+        return res.status(404).json({
+            success: false,
+            message: 'Legal page not found'
+        });
+    }
+    res.sendFile(legalPath);
 });
 
 module.exports = router;
