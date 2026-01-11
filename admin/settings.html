@@ -347,14 +347,19 @@
                 <input type="text" id="heroSubtitle" name="heroSubtitle" required placeholder="نقدم حلول أمنية متكاملة وموثوقة لضمان سلامتك وسلامة ممتلكاتك">
             </div>
             <div class="form-group">
-                <label>رفع الصور (حد أقصى 5 صور)</label>
-                <div class="upload-area" id="uploadArea">
+                <label>روابط الصور (حد أقصى 5 صور)</label>
+                <div class="upload-area" id="uploadArea" style="display: none;">
                     <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
                     <div class="upload-placeholder">
                         <div class="upload-icon">📤</div>
                         <p>انقر لرفع الصور أو اسحبها هنا</p>
                         <small>JPEG, JPG, PNG, GIF, WEBP (حد أقصى 5MB لكل صورة)</small>
                     </div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="heroImagesUrls">أدخل روابط الصور (مفصولة بفواصل)</label>
+                    <textarea id="heroImagesUrls" name="heroImagesUrls" rows="4" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
+                    <small style="color: #666; display: block; margin-top: 0.5rem;">💡 على Netlify: استخدم روابط الصور مباشرة. يمكنك الصور auf Cloudinary, Imgur, oder anderen Services hochladen.</small>
                 </div>
                 <div class="uploaded-images" id="uploadedImages">
                     <!-- Images will be displayed here -->
@@ -451,6 +456,9 @@
                     if (config.hero) {
                         document.getElementById('heroTitle').value = config.hero.title || '';
                         document.getElementById('heroSubtitle').value = config.hero.subtitle || '';
+                        if (config.hero.images && config.hero.images.length > 0) {
+                            document.getElementById('heroImagesUrls').value = config.hero.images.join(', ');
+                        }
                         loadHeroImages();
                     }
                 }
@@ -503,7 +511,7 @@
                 hero: {
                     title: document.getElementById('heroTitle').value,
                     subtitle: document.getElementById('heroSubtitle').value,
-                    images: [] // Images are managed separately via upload API
+                    images: document.getElementById('heroImagesUrls').value.split(',').map(img => img.trim()).filter(img => img.length > 0)
                 }
             };
 
