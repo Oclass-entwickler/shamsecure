@@ -33,5 +33,39 @@ const handler = serverless(app, {
 
 exports.handler = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
+    
+    // Fix the path for Netlify redirects
+    // Netlify passes the full path in event.path
+    // When redirecting /admin/login, the path might be /.netlify/functions/admin/login
+    // or just /login depending on how the redirect is configured
+    
+    let actualPath = event.path || '/';
+    
+    // Remove /.netlify/functions/admin prefix if present
+    if (actualPath.startsWith('/.netlify/functions/admin')) {
+        actualPath = actualPath.replace('/.netlify/functions/admin', '') || '/';
+    }
+    // Remove /admin prefix if present (shouldn't happen with redirects, but just in case)
+    else if (actualPath.startsWith('/admin')) {
+        actualPath = actualPath.replace('/admin', '') || '/';
+    }
+    
+    // Update event.path to the actual path
+    event.path = actualPath;
+    
+    // Also update rawPath if it exists
+    if (event.rawPath) {
+        if (event.rawPath.startsWith('/.netlify/functions/admin')) {
+            event.rawPath = event.rawPath.replace('/.netlify/functions/admin', '') || '/';
+        } else if (event.rawPath.startsWith('/admin')) {
+            event.rawPath = event.rawPath.replace('/admin', '') || '/';
+        }
+    }
+    
+    console.log('Admin function called');
+    console.log('Original path:', event.path);
+    console.log('Fixed path:', actualPath);
+    console.log('Query params:', event.queryStringParameters);
+    
     return handler(event, context);
 };
